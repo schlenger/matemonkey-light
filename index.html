@@ -1,0 +1,85 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>MateMonkey light v0.1</title>
+		<meta charset="UTF-8">
+		
+		<!-- css -->
+		<link rel="stylesheet" type="text/css" href="css/style.css" />
+
+		<!-- webfonts -->
+		<link href='https://fonts.googleapis.com/css?family=Open+Sans|Rancho' rel='stylesheet' type='text/css'>
+
+		<!-- js -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+
+		<!-- leaflet -->
+		<link rel="stylesheet" href="js/leaflet/leaflet.css" />
+		<script src="js/leaflet/leaflet.js"></script>
+		<!-- leaflet cluster-->
+		<script src="js/leaflet-cluster/leaflet.markercluster.js"></script>
+		<link rel="stylesheet" href="js/leaflet-cluster/MarkerCluster.css" />
+		<link rel="stylesheet" href="js/leaflet-cluster/MarkerCluster.Default.css" />
+
+
+		<!--[if IE]>
+	    <script>
+	    document.createElement("header");
+	    document.createElement("footer");
+	    document.createElement("nav");
+	    document.createElement("aside");
+	    </script>    
+	    <![endif]-->
+
+		<!-- mobile stuff -->
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+	</head>
+
+	<body>
+
+		<div id="wrapper">
+			<header>
+				<nav>
+					<ul>
+						<li><a href="#" rel="products" class="filterLink">Choose Products</a></li>
+						<li><a href="#" rel="dealerTypes" class="filterLink">Dealertype</a></li>
+						<li><form id="search" >
+								<input type="text" placeholder="Search..." id="searchbar"><input type="submit" value="Go">
+							</form></li>
+					</ul>
+				</nav>
+				<h1><a href="#" id="logo">Mate Monkey <span>light</span></a></h1>
+				<p id="products" class="filter">
+					<span id="selectOptions"><a href='#' id='selectAll'>Select All</a> | <a href='#' id='selectNone'> None</a></span>
+				</p>
+				<p id="dealerTypes" class="filter">
+					<label><input onchange='MM.updateDealerFilterCriteria()' name='dealers[]' type="checkbox" value="bar" checked />Bar</label>
+					<label><input onchange='MM.updateDealerFilterCriteria()' name='dealers[]' type="checkbox" value="club" checked />Club</label>
+					<label><input onchange='MM.updateDealerFilterCriteria()' name='dealers[]' type="checkbox" value="retail" checked />Retail</label>
+					<label><input onchange='MM.updateDealerFilterCriteria()' name='dealers[]' type="checkbox" value="restaurant" checked />Restaurant</label>
+					<label><input onchange='MM.updateDealerFilterCriteria()' name='dealers[]' type="checkbox" value="hackerspace" checked />Hackerspace</label>
+					<label><input onchange='MM.updateDealerFilterCriteria()' name='dealers[]' type="checkbox" value="community" checked />Community</label>
+					<label><input onchange='MM.updateDealerFilterCriteria()' name='dealers[]' type="checkbox" value="other" checked />Other</label>
+				</p>
+			</header>
+			<div id="mapWrapper">
+				<div id="map"></div>
+				<div id="dealerInfoWrapper">
+					<div id="dealerInfo" class="clickable"><h2></h2></div>
+					<div id="dealerDescription"></div>
+				</div>
+			</div>
+
+			<footer>
+				<p>
+					<a href="https://github.com/MateMonkey/" target="_blank">On GitHub</a> 
+					| &copy; Copyright 2015 | 
+					<a href="http://matemonkey.com" target="_blank" title="">Original MateMonkey</a>
+				</p>
+			</footer>
+		</div>
+		
+		<!-- custom scripts and framework -->
+		<script type="text/javascript" src="js/scripts.js"></script>
+	</body>
+</html>
