@@ -63,9 +63,14 @@ header {
 	padding: 0px 20px;
 }
 
-h1,
-h2 {
+h1 {
 	font-family: 'Rancho';
+}
+
+h1,
+h2,
+h3,
+h4 {
 	font-weight: normal;
 }
 
@@ -103,7 +108,7 @@ nav ul li a:active {
 	color:#fff;
 }
 
-nav li a:hover {
+nav ul li a:hover {
 	color:#A4E223;
 }
 
@@ -123,11 +128,11 @@ a:hover {
 #map a,
 #map a:link,
 #map a:active {
-	color:#5F553B;
+	color:#8DC120;
 }
 
 #map a:hover {
-	color:#7B6937;
+	color:#A4E223;
 }
 
 
@@ -156,6 +161,34 @@ a:hover {
 	cursor: pointer;
 }
 
+.clickable i {
+	visibility: visible !important;
+	opacity: 1 !important;
+	transition: visibility 0.5s, opacity 0.5s linear;
+}
+
+#dealerInfo i {
+	visibility: hidden;
+	opacity: 0;
+	float:right;
+}
+
+#dealerInfo {
+	text-align: center;
+	border-bottom: 1px solid #eee;
+}
+
+#dealerInfo h2 {
+	margin-bottom: 0;
+}
+
+#dealerInfo h2 span{
+	font-family: 'Open Sans';
+	color:#666;
+	font-size: 0.8em;
+}
+
+
 #dealerInfo,
 #dealerDescription {
 	padding: 10px 20px;
@@ -163,6 +196,24 @@ a:hover {
 
 #dealerDescription {
 	display: none;
+	text-align: center;
+}
+
+
+#dealerDescription .note{
+	color:#666;
+}
+
+.stock {
+
+}
+
+.stock-unknown {
+	color:#666;
+}
+
+.stock-full {
+	color:#8DC120;
 }
 
 /* the filters */
@@ -228,7 +279,7 @@ a:hover {
 	border-bottom-left-radius: 5px; 
 }
 
-#search input[type="submit"] {
+#search button {
 	border-top-right-radius: 5px;
 	border-bottom-right-radius: 5px; 
 }
@@ -240,14 +291,15 @@ a:hover {
 	color: #000;
 }
 
-#search input[type="submit"] {
-	padding: 5px 5px;
+#search button {
+	padding: 6px 5px;
 	margin: 0;
+	margin-left: -4px;
 	cursor: pointer;
 	width: auto !important;
 	background: #7FAF1B;
 	color:#fff !important;
 }
-#search input[type="submit"]:hover {
+#search button:hover {
 	background: #A4E223;
 }

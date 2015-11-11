@@ -34,6 +34,13 @@ $( document ).ready(function() {
 		$("#products input").prop('checked', false);
 		MM.updateFilterCriteria();
 	});
+
+
+	// responsive ;)
+	window.onresize = function (e) {
+		height = window.innerHeight - $("header").height() - $("footer").height()-40;
+		$("#map").height(height);
+	}
 });
 
 
@@ -78,7 +85,8 @@ var MM = {
 		// get window height for map size:
 		height = window.innerHeight - $("header").height() - $("footer").height()-40;
 		$("#map").height(height);
-		// console.log("inner: "+ $(window).height() + "| header: "+ $("header").height()+ "| footer: "+ $("footer").height()+"| new: "+ height);
+		// console.log("inner: "+ $(window).height() + "| header: "+ $("header").height()+ "| footer: "
+		//	+ $("footer").height()+"| new: "+ height);
 
 		// set up the map
 		map = new L.Map('map' , { maxZoom: 17 });
@@ -126,7 +134,7 @@ var MM = {
 		// if user clicks on map, hide filterpanels
 		map.on("click", function(e) { $(".filter").hide(100); });
 		// display dealer data on marker click
-		map.on("popupopen", function (e){ MM.showDealer(e.popup._source.dealerID); });
+		map.on("popupopen", function (e){ MM.showDealer(e.popup._source.dealerData.id); });
 		map.on("popupclose", function (e){ 
 			$("#dealerInfoWrapper").fadeOut(100, function(){ $("#dealerDescription").hide();});
 			$("#dealerDescription").html("");
@@ -157,12 +165,12 @@ var MM = {
 				var dealer = L.marker([val.address.lat, val.address.lon]).addTo(markers);
 				dealer.bindPopup("<strong>"+val.name+"</strong><br>"+
 					val.address.street+" "+val.address.number+"<br>"+val.address.postal+" "+val.address.city+
-					"<br><a href='?id=444' onclick='event.preventDefault();MM.showDealerDescription();'>Mehr anzeigen</a>");
+					"<br><a href='?id=444' onclick='event.preventDefault();MM.showDealerDescription();'>&raquo; Produkte anzeigen</a>");
 					//"<br><a href='?id=444' onclick='event.preventDefault();MM.showDealer("+val.id+")'>Mehr anzeigen</a>");
 				// note: check how much space this requires
 				// + only one network query || - requires disk space? 
 				MM.addedDealers[val.id] = val;
-				dealer.dealerID = val.id;
+				dealer.dealerData = val;
 			}
 		});
 
@@ -216,19 +224,25 @@ var MM = {
 	},
 	//displays a single dealer with detailed information
 	showDealer: function (id) {
+		// direct feedback before ajax request
+		$("#dealerInfoWrapper").fadeIn(100);
+		//display dealerinfo
+		$("#dealerInfo h2").html(MM.addedDealers[id].name + " <span> | " + MM.addedDealers[id].type + "</span>");
+
 		// fetch dealer information
 		jQuery.ajax( {
 			url: MM.baseURL + 'dealers/' + id + '/stock?current=true',
 			type: 'GET',
 			dataType: 'json',
 			success: function(data) {
-				$("#dealerInfoWrapper").fadeIn(100);
+				if(MM.addedDealers[id].note != '')
+					$("#dealerDescription").append("<p class='note'>Note: "+MM.addedDealers[id].note+"</p>");
 				//console.log("Data Fetched! - "+ JSON.stringify(data));
 				if(data.count != 0) {
 					jQuery.each(data.entries, function(i, entry) {
-						var output = "<strong>"+entry.product.name+"</strong>";
-						if(entry.status != 'unknown')
-							output += " Stock: " + entry.status;
+						var output = "<strong>"+entry.product.name+"</strong><br>";
+						//if(entry.status != 'unknown')
+							output += "<span class='stock-"+entry.status+" stock'> Stock: " + entry.status + "</span>";
 						if(entry.price != '?') {
 							p = entry.price + "";
 							output += " for ";
@@ -242,9 +256,6 @@ var MM = {
 
 						$("#dealerDescription").append(output + "<br>");
 					});
-
-					//display dealerinfo
-					$("#dealerInfo h2").html(MM.addedDealers[id].name);
 					//console.log(MM.addedDealers[id]);
 				}
 				else {
