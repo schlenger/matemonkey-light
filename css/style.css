@@ -13,6 +13,7 @@ body {
 	background: #333; /*1F561F*/
 	color: #fff;
 
+	/* no user select */
 	-webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -88,17 +89,26 @@ footer p {
 	margin-bottom: 5px;
 }
 
+header h1 {
+	position: absolute;
+	left:30px;
+	top:-8px;
+}
 
 /* navigation */
 nav ul {
 	list-style-type: none;
-	float: right;
 	margin-top: 10px;
+	text-align: right;
 }
 
 nav ul li {
 	display: inline-block;
 	margin-left: 10px;
+}
+
+nav ul li a i {
+	display: none !important;
 }
 
 nav ul li a,
@@ -150,7 +160,7 @@ a:hover {
 #dealerInfoWrapper {
 	position: absolute;
 	bottom: 0px;
-	z-index: 10000;
+	z-index: 9999;
 	background: #fff;
 	color:#000;
 	width: 100%;
@@ -302,4 +312,45 @@ a:hover {
 }
 #search button:hover {
 	background: #A4E223;
+}
+
+
+/* mobile fixes */
+@media (max-width: 580px) {
+	header h1 {
+		top:-4px;
+		font-size: 1.5em;
+	}
+
+
+}
+
+@media (max-width: 550px) {
+	header h1 {
+		position: static;
+		afont-size: 0.8em;
+		text-align: center;
+		margin-bottom: 0;
+	}
+	nav ul {
+		text-align: center;
+		margin-top: 0px;
+	}
+
+	/* toggle symbols*/
+	nav ul li a i {
+		display: inline !important;
+	}
+
+	nav ul li a span {
+		display: none;
+	}
+
+	nav ul li {
+		line-height: 200%;
+	}
+
+	#search input {
+		width: 60px;
+	}
 }

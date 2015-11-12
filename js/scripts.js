@@ -34,13 +34,8 @@ $( document ).ready(function() {
 		$("#products input").prop('checked', false);
 		MM.updateFilterCriteria();
 	});
-
-
-	// responsive ;)
-	window.onresize = function (e) {
-		height = window.innerHeight - $("header").height() - $("footer").height()-40;
-		$("#map").height(height);
-	}
+	
+	MM.onWindowResize();
 });
 
 
@@ -140,6 +135,13 @@ var MM = {
 			$("#dealerDescription").html("");
 			$("#dealerInfo").addClass("clickable");
 		});
+	},
+	// what to do on window resize?
+	onWindowResize : function () {
+		height = window.innerHeight - $("header").height() - $("footer").height()-40;
+		$("#map").height(height);
+		//console.log("resize");
+		$(".filter").css("top",$("header").height()+13);
 	},
 	// geoencodes a place string and sets view center new
 	updateMapWithGeolocation : function (geoLocation) {
@@ -305,3 +307,6 @@ var MM = {
 }
 
 MM.init();
+
+// auto hide status bar on mobile
+window.onresize = function() { MM.onWindowResize(); };

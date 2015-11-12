@@ -22,7 +22,6 @@
 		<link rel="stylesheet" href="js/leaflet-cluster/MarkerCluster.css" />
 		<link rel="stylesheet" href="js/leaflet-cluster/MarkerCluster.Default.css" />
 
-
 		<!--[if IE]>
 	    <script>
 	    document.createElement("header");
@@ -34,16 +33,21 @@
 
 		<!-- mobile stuff -->
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+		<!-- mobile stuff: display fullscreen -->
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="mobile-web-app-capable" content="yes">
 	</head>
 
 	<body>
 
 		<div id="wrapper">
 			<header>
+				<h1><a href="#" id="logo">Mate Monkey <span>light</span></a></h1>
+
 				<nav>
 					<ul>
-						<li><a href="#" rel="products" class="filterLink">Choose Products</a></li>
-						<li><a href="#" rel="dealerTypes" class="filterLink">Dealertype</a></li>
+						<li><a href="#" rel="products" class="filterLink"><span>Filter</span><i class="fa fa-check-square-o"></i> Products</a></li>
+						<li><a href="#" rel="dealerTypes" class="filterLink"><span>Filter</span><i class="fa fa-check-square-o"></i> Dealer</a></li>
 						<li><form id="search" >
 								<input type="text" placeholder="Search..." id="searchbar">
 								<button type="submit"><i class="fa fa-search"></i></button>
@@ -51,7 +55,8 @@
 							</form></li>
 					</ul>
 				</nav>
-				<h1><a href="#" id="logo">Mate Monkey <span>light</span></a></h1>
+
+				
 				<p id="products" class="filter">
 					<span id="selectOptions"><a href='#' id='selectAll'>Select All</a> | <a href='#' id='selectNone'> None</a></span>
 				</p>
