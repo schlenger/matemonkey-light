@@ -180,7 +180,8 @@ a:hover {
 #dealerInfo i {
 	visibility: hidden;
 	opacity: 0;
-	float:right;
+	margin-right: 20px;
+	font-weight: normal;
 }
 
 #dealerInfo {
@@ -190,9 +191,10 @@ a:hover {
 
 #dealerInfo h2 {
 	margin-bottom: 0;
+	margin-right: 20px;
 }
 
-#dealerInfo h2 span{
+#dealerInfo h2 .small {
 	font-family: 'Open Sans';
 	color:#666;
 	font-size: 0.8em;
@@ -212,6 +214,9 @@ a:hover {
 
 #dealerDescription .note{
 	color:#666;
+	max-width: 500px;
+	margin: 0 auto;
+	margin-bottom: 15px;
 }
 
 .stock {

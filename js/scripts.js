@@ -39,12 +39,11 @@ $( document ).ready(function() {
 });
 
 
-var map;
-var markers = L.markerClusterGroup({ showCoverageOnHover: false, spiderfyOnMaxZoom: false });
-
 // The Mate Monkey API Connection
 // Implementation for MeteMonkey light v0.1
 var MM = {
+	map: null,
+	markers : L.markerClusterGroup({ showCoverageOnHover: false, spiderfyOnMaxZoom: false }),
 	baseURL: 'http://playground.matemonkey.com/api/v1/',
 	productFilter: '',
 	dealerTypeFilter: '',
@@ -84,14 +83,14 @@ var MM = {
 		//	+ $("footer").height()+"| new: "+ height);
 
 		// set up the map
-		map = new L.Map('map' , { maxZoom: 17 });
+		MM.map = new L.Map('map' , { maxZoom: 17 });
 
 		// create the tile layer with correct attribution
 		var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 		var osmAttrib = 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors';
 		var osm = new L.TileLayer(osmUrl, {minZoom: 5, maxZoom: 17, attribution: osmAttrib});
-		map.addLayer(osm);
-		map.addLayer(markers);
+		MM.map.addLayer(osm);
+		MM.map.addLayer(MM.markers);
 
 		var standardCity = "München";
 
@@ -121,16 +120,16 @@ var MM = {
 		  }}); */
 		
 		// event binding
-		map.on("zoomend", function(e) { MM.calculateAddedBoundingBoxes(); });
-		map.on("resize", function(e) { MM.calculateAddedBoundingBoxes(); });
-		map.on("dragend", function(e) { MM.calculateAddedBoundingBoxes(); });
-		map.on("zoomend", function(e) { MM.calculateAddedBoundingBoxes(); });
-		map.on("zoomstart", function(e) { $(".filter").hide(100); });
+		MM.map.on("zoomend", function(e) { MM.calculateAddedBoundingBoxes(); });
+		MM.map.on("resize", function(e) { MM.calculateAddedBoundingBoxes(); });
+		MM.map.on("dragend", function(e) { MM.calculateAddedBoundingBoxes(); });
+		MM.map.on("zoomend", function(e) { MM.calculateAddedBoundingBoxes(); });
+		MM.map.on("zoomstart", function(e) { $(".filter").fadeOut(100); });
 		// if user clicks on map, hide filterpanels
-		map.on("click", function(e) { $(".filter").hide(100); });
+		MM.map.on("click", function(e) { $(".filter").fadeOut(100); });
 		// display dealer data on marker click
-		map.on("popupopen", function (e){ MM.showDealer(e.popup._source.dealerData.id); });
-		map.on("popupclose", function (e){ 
+		MM.map.on("popupopen", function (e){ $(".filter").fadeOut(100);MM.showDealer(e.popup._source.dealerData.id); });
+		MM.map.on("popupclose", function (e){ 
 			$("#dealerInfoWrapper").fadeOut(100, function(){ $("#dealerDescription").hide();});
 			$("#dealerDescription").html("");
 			$("#dealerInfo").addClass("clickable");
@@ -145,43 +144,18 @@ var MM = {
 	},
 	// geoencodes a place string and sets view center new
 	updateMapWithGeolocation : function (geoLocation) {
-		map.setView(new L.LatLng(geoLocation.lat, geoLocation.lon), 9);
+		MM.map.setView(new L.LatLng(geoLocation.lat, geoLocation.lon), 9);
 		MM.calculateAddedBoundingBoxes();
 	},
 	// fetch data on bounding box update
 	calculateAddedBoundingBoxes : function () {
 		// get the current boundaries and fetch the data for it
 		// todo: do that one intelligent ;)
-	    var bounds = map.getBounds();
+	    var bounds = MM.map.getBounds();
 	    if(MM.currentBounding != bounds) {
 	    	MM.currentBounding = bounds;
 			MM.getBoxData( bounds ); //trigger manually
 	    }
-	},
-	// sets all markers on map for given json data
-	dealerToMap : function(data) {
-		jQuery.each(data, function(i, val) {
-			// check if dealer was already added
-			if(MM.addedDealers[val.id] == undefined) {
-			//old: if($.inArray(val.id, MM.addedDealers) == -1) {
-				var dealer = L.marker([val.address.lat, val.address.lon]).addTo(markers);
-				dealer.bindPopup("<strong>"+val.name+"</strong><br>"+
-					val.address.street+" "+val.address.number+"<br>"+val.address.postal+" "+val.address.city+
-					"<br><a href='?id=444' onclick='event.preventDefault();MM.showDealerDescription();'>&raquo; Produkte anzeigen</a>");
-					//"<br><a href='?id=444' onclick='event.preventDefault();MM.showDealer("+val.id+")'>Mehr anzeigen</a>");
-				// note: check how much space this requires
-				// + only one network query || - requires disk space? 
-				MM.addedDealers[val.id] = val;
-				dealer.dealerData = val;
-			}
-		});
-
-		
-
-		// update all new links
-		jQuery(".dealerInfo").click(function(e){
-			e.preventDefault();
-		})
 	},
 	// gets the dealerinformation for a given bounding box
 	getBoxData: function (bounds) {
@@ -214,6 +188,31 @@ var MM = {
 				MM.updateMapWithGeolocation(data);
 		}});
 	},
+	// sets all markers on map for given json data
+	dealerToMap : function(data) {
+		jQuery.each(data, function(i, val) {
+			// check if dealer was already added
+			if(MM.addedDealers[val.id] == undefined) {
+			//old: if($.inArray(val.id, MM.addedDealers) == -1) {
+				var dealer = L.marker([val.address.lat, val.address.lon]).addTo(MM.markers);
+				dealer.bindPopup("<strong>"+val.name+"</strong><br>"+
+					val.address.street+" "+val.address.number+"<br>"+val.address.postal+" "+val.address.city+
+					"<br><a href='?id=444' onclick='event.preventDefault();MM.showDealerDescription();'>&raquo; Produkte anzeigen</a>");
+					//"<br><a href='?id=444' onclick='event.preventDefault();MM.showDealer("+val.id+")'>Mehr anzeigen</a>");
+				// note: check how much space this requires
+				// + only one network query || - requires disk space? 
+				MM.addedDealers[val.id] = val;
+				dealer.dealerData = val;
+			}
+		});
+
+		
+
+		// update all new links
+		jQuery(".dealerInfo").click(function(e){
+			e.preventDefault();
+		})
+	},
 	// reloads new data if map is moved
 	reloadData: function (box) {
 		// todo: only load new data
@@ -229,7 +228,7 @@ var MM = {
 		// direct feedback before ajax request
 		$("#dealerInfoWrapper").fadeIn(100);
 		//display dealerinfo
-		$("#dealerInfo h2").html(MM.addedDealers[id].name + " <span> | " + MM.addedDealers[id].type + "</span>");
+		$("#dealerInfo h2 span").html(MM.addedDealers[id].name + " <span class='small'> | " + MM.addedDealers[id].type + "</span>");
 
 		// fetch dealer information
 		jQuery.ajax( {
@@ -279,9 +278,9 @@ var MM = {
 		MM.productFilter = MM.productFilter.substring(0, MM.productFilter.length - 1);
 
 		// remove all previous marker
-		map.removeLayer(markers);
-		markers = L.markerClusterGroup({ showCoverageOnHover: false, spiderfyOnMaxZoom: false });
-		map.addLayer(markers);
+		MM.map.removeLayer(MM.markers);
+		MM.markers = L.markerClusterGroup({ showCoverageOnHover: false, spiderfyOnMaxZoom: false });
+		MM.map.addLayer(MM.markers);
 		MM.addedDealers = [];
 
 		// update with new information
@@ -296,9 +295,9 @@ var MM = {
 		MM.dealerTypeFilter = MM.dealerTypeFilter.substring(0, MM.dealerTypeFilter.length - 1);
 
 		// remove all previous marker
-		map.removeLayer(markers);
-		markers = L.markerClusterGroup({ showCoverageOnHover: false, spiderfyOnMaxZoom: false });
-		map.addLayer(markers);
+		MM.map.removeLayer(MM.markers);
+		MM.markers = L.markerClusterGroup({ showCoverageOnHover: false, spiderfyOnMaxZoom: false });
+		MM.map.addLayer(MM.markers);
 		MM.addedDealers = [];
 
 		// update with new information
@@ -307,6 +306,4 @@ var MM = {
 }
 
 MM.init();
-
-// auto hide status bar on mobile
 window.onresize = function() { MM.onWindowResize(); };
