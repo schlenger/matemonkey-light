@@ -20,6 +20,22 @@ $( document ).ready(function() {
 		if(query = $("#searchbar").val())
 			MM.getQueryData(query);
 		$(".filter").hide();
+
+		// autohide keyboard on mobile devices
+		// http://stackoverflow.com/questions/8335834/how-can-i-hide-the-android-keyboard-using-javascript
+		var field = document.createElement('input');
+		field.setAttribute('type', 'text');
+		document.body.appendChild(field);
+
+		setTimeout(function() {
+		    field.focus();
+		    setTimeout(function() {
+		        field.setAttribute('style', 'display:none;');
+		    }, 50);
+		}, 50);
+
+		// fix for martin
+		$("html, body").animate({ scrollTop: 0 });
 	});
 
 	$("#dealerInfo").click(function(e){MM.showDealerDescription();});
@@ -63,11 +79,13 @@ var MM = {
 				jQuery.each(data.products, function(i, product) {
 					//products.push({name:product.name, id:product.id})
 					if(product.name != "Club Mate 0.5l")
-						prodcutsDOM.prepend("<label><input type='checkbox' name='products[]' value='"+
-							product.id+"' onchange='MM.updateFilterCriteria()' checked />"+product.name+"</label>");
+						prodcutsDOM.prepend("<label><input type='checkbox' name='products[]' value='"
+							+ product.id+"' onchange='MM.updateFilterCriteria()' checked />"
+							+ product.name+"</label>");
 					else
-						prodcutsDOM.prepend("<label><input type='checkbox' name='products[]' value='"+
-							product.id+"' onchange='MM.updateFilterCriteria()' checked /><strong>"+product.name+"</strong></label>");
+						prodcutsDOM.prepend("<label><input type='checkbox' name='products[]' value='"
+							+ product.id+"' onchange='MM.updateFilterCriteria()' checked /><strong>"
+							+ product.name+"</strong></label>");
 
 					MM.productFilter += product.id + ',';
 				});
@@ -113,23 +131,29 @@ var MM = {
 		  url: 'http://freegeoip.net/json/', type: 'POST', dataType: 'jsonp',
 		  success: function(location) {
 		    // Available from freegeoip.net:
-		    // city, region_code, region_name, areacode, ip, zipcode, longitude, latitude, country_name, country_code
+		    // city, region_code, region_name, areacode, ip, zipcode, longitude
+		    // latitude, country_name, country_code
 		    map.setView(new L.LatLng(location.latitude, location.longitude),10);
 		    console.log("Location fetched!");
 		    
 		  }}); */
 		
-		// event binding
+		// refetch dealer data on map events
 		MM.map.on("zoomend", function(e) { MM.calculateAddedBoundingBoxes(); });
 		MM.map.on("resize", function(e) { MM.calculateAddedBoundingBoxes(); });
 		MM.map.on("dragend", function(e) { MM.calculateAddedBoundingBoxes(); });
 		MM.map.on("zoomend", function(e) { MM.calculateAddedBoundingBoxes(); });
+		
+		// hide filterpanels on map events
 		MM.map.on("zoomstart", function(e) { $(".filter").fadeOut(100); });
-		// if user clicks on map, hide filterpanels
 		MM.map.on("click", function(e) { $(".filter").fadeOut(100); });
-		// display dealer data on marker click
-		MM.map.on("popupopen", function (e){ $(".filter").fadeOut(100);MM.showDealer(e.popup._source.dealerData.id); });
-		MM.map.on("popupclose", function (e){ 
+		
+		// display dealer data on marker click and hide it on close
+		MM.map.on("popupopen", function (e) {
+			$(".filter").fadeOut(100);
+			MM.showDealer(e.popup._source.dealerData.id);
+		});
+		MM.map.on("popupclose", function (e) { 
 			$("#dealerInfoWrapper").fadeOut(100, function(){ $("#dealerDescription").hide();});
 			$("#dealerDescription").html("");
 			$("#dealerInfo").addClass("clickable");
@@ -139,10 +163,9 @@ var MM = {
 	onWindowResize : function () {
 		height = window.innerHeight - $("header").height() - $("footer").height()-40;
 		$("#map").height(height);
-		//console.log("resize");
 		$(".filter").css("top",$("header").height()+13);
 	},
-	// geoencodes a place string and sets view center new
+	// geo encodes a place string and sets view center new
 	updateMapWithGeolocation : function (geoLocation) {
 		MM.map.setView(new L.LatLng(geoLocation.lat, geoLocation.lon), 9);
 		MM.calculateAddedBoundingBoxes();
@@ -161,7 +184,8 @@ var MM = {
 	getBoxData: function (bounds) {
 		if(bounds == undefined)
 			bounds = MM.currentBounding;
-		box = bounds._southWest.lat + "," + bounds._southWest.lng + "," + bounds._northEast.lat + "," + bounds._northEast.lng;
+		box = bounds._southWest.lat + "," + bounds._southWest.lng + "," + bounds._northEast.lat 
+				 + "," + bounds._northEast.lng;
 		
 		url = MM.baseURL + 'dealers?bbox=' + box;
 		//if (MM.productFilter != '')
@@ -195,10 +219,12 @@ var MM = {
 			if(MM.addedDealers[val.id] == undefined) {
 			//old: if($.inArray(val.id, MM.addedDealers) == -1) {
 				var dealer = L.marker([val.address.lat, val.address.lon]).addTo(MM.markers);
-				dealer.bindPopup("<strong>"+val.name+"</strong><br>"+
-					val.address.street+" "+val.address.number+"<br>"+val.address.postal+" "+val.address.city+
-					"<br><a href='?id=444' onclick='event.preventDefault();MM.showDealerDescription();'>&raquo; Produkte anzeigen</a>");
-					//"<br><a href='?id=444' onclick='event.preventDefault();MM.showDealer("+val.id+")'>Mehr anzeigen</a>");
+				dealer.bindPopup("<strong>"+val.name+"</strong><br>"
+					+ val.address.street+" "+val.address.number+"<br>"+val.address.postal+" "
+					+ val.address.city+"<br><a href='?id=444' onclick='event.preventDefault();"
+					+ "MM.showDealerDescription();'>&raquo; Produkte anzeigen</a>");
+					//"<br><a href='?id=444' onclick='event.preventDefault();MM.showDealer("+val.id+
+					//	")'>Mehr anzeigen</a>");
 				// note: check how much space this requires
 				// + only one network query || - requires disk space? 
 				MM.addedDealers[val.id] = val;
@@ -228,7 +254,8 @@ var MM = {
 		// direct feedback before ajax request
 		$("#dealerInfoWrapper").fadeIn(100);
 		//display dealerinfo
-		$("#dealerInfo h2 span").html(MM.addedDealers[id].name + " <span class='small'> | " + MM.addedDealers[id].type + "</span>");
+		$("#dealerInfo h2 span").html(MM.addedDealers[id].name + " <span class='small'> | " 
+			+ MM.addedDealers[id].type + "</span>");
 
 		// fetch dealer information
 		jQuery.ajax( {
@@ -243,7 +270,8 @@ var MM = {
 					jQuery.each(data.entries, function(i, entry) {
 						var output = "<strong>"+entry.product.name+"</strong><br>";
 						//if(entry.status != 'unknown')
-							output += "<span class='stock-"+entry.status+" stock'> Stock: " + entry.status + "</span>";
+							output += "<span class='stock-"+entry.status+" stock'> Stock: " 
+										+ entry.status + "</span>";
 						if(entry.price != '?') {
 							p = entry.price + "";
 							output += " for ";
@@ -251,16 +279,17 @@ var MM = {
 								output+= "0";
 							else
 								output+= p.substring(0,p.length-2);
-							output += ","+p.substring(p.length-2)+" "+MM.addedDealers[id].currency;
+							output += ","+p.substring(p.length-2)+" "+ MM.addedDealers[id].currency;
 							output += " per " + entry.quantity;
 						}
 
 						$("#dealerDescription").append(output + "<br>");
 					});
 					//console.log(MM.addedDealers[id]);
+					window.history.pushState({"pageTitle":MM.addedDealers[id].name},"", "#/?test="+MM.addedDealers[id].id);
 				}
 				else {
-					console.log("No entries available for this dealer!");
+					$("#dealerDescription").append("No entries available for this dealer!");
 				}
 			}});
 	},
