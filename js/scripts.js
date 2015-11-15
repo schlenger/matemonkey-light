@@ -61,7 +61,7 @@ var MM = {
 	map: null,
 	markers : L.markerClusterGroup({ showCoverageOnHover: false, spiderfyOnMaxZoom: false }),
 	baseURL: 'http://playground.matemonkey.com/api/v1/',
-	productFilter: '',
+	productFilter: '42,41,7,11,10,9,8,19,20,22,23,21,18,28,30,29,44,43,13,12,27,14,37,36,33,35,34,17,31,26,24,6,5,4,3,1,2,15,16,39,38,32,40,25',
 	dealerTypeFilter: '',
 	currentBounding: {},
 	// the added dealer markers
@@ -76,6 +76,7 @@ var MM = {
 			url: MM.baseURL + 'products/', type: 'GET', dataType: 'json',
 			success: function(data) {
 				//console.log("Data Fetched! - "+ JSON.stringify(data));
+				MM.productFilter = "";
 				jQuery.each(data.products, function(i, product) {
 					//products.push({name:product.name, id:product.id})
 					if(product.name != "Club Mate 0.5l")
@@ -111,9 +112,25 @@ var MM = {
 		MM.map.addLayer(MM.markers);
 
 		var standardCity = "München";
+		var urlCity = location.search.substr(1);
 
+		// check if a dealer is loaded via the url
+		if(urlCity != ""){
+			var data = urlCity.split("&");
+			MM.updateMapWithGeolocation({lat:data[1], lon:data[2]});
+			MM.map.setZoom(17);
+
+			// wait till markers are loaded
+			// todo: do this as a callback
+			setTimeout(function () {
+				MM.markers.eachLayer(function(marker) {
+					if (marker.title == data[0].substr(3))
+						marker.openPopup();
+				});
+			}, 500);
+		}
 		//get the current users geolocation
-		if (navigator.geolocation) {
+		else if (navigator.geolocation) {
 			// only way working on localhost / maybe try something in the callback serverside
 			var pos = navigator.geolocation.getCurrentPosition(function (pos) { return pos;});
 
@@ -158,6 +175,8 @@ var MM = {
 			$("#dealerDescription").html("");
 			$("#dealerInfo").addClass("clickable");
 		});
+
+		//console.log(location.search.substr(1));
 	},
 	// what to do on window resize?
 	onWindowResize : function () {
@@ -226,13 +245,12 @@ var MM = {
 					//"<br><a href='?id=444' onclick='event.preventDefault();MM.showDealer("+val.id+
 					//	")'>Mehr anzeigen</a>");
 				// note: check how much space this requires
-				// + only one network query || - requires disk space? 
+				// + only one network query || - requires disk space?
+				dealer.title = val.id;
 				MM.addedDealers[val.id] = val;
 				dealer.dealerData = val;
 			}
 		});
-
-		
 
 		// update all new links
 		jQuery(".dealerInfo").click(function(e){
@@ -286,7 +304,13 @@ var MM = {
 						$("#dealerDescription").append(output + "<br>");
 					});
 					//console.log(MM.addedDealers[id]);
-					window.history.pushState({"pageTitle":MM.addedDealers[id].name},"", "#/?test="+MM.addedDealers[id].id);
+					try {
+						window.history.pushState({"pageTitle":MM.addedDealers[id].name},"",
+							"index.html?id="+MM.addedDealers[id].id+"&"+MM.addedDealers[id].address.lat+"&"+MM.addedDealers[id].address.lon);
+					}
+					catch (err) {
+						console.log("Doesn't work on local machines:" + err);
+					}
 				}
 				else {
 					$("#dealerDescription").append("No entries available for this dealer!");
