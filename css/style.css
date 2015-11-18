@@ -98,7 +98,7 @@ header h1 {
 /* navigation */
 nav ul {
 	list-style-type: none;
-	margin-top: 10px;
+	margin-top: 5px;
 	text-align: right;
 }
 
@@ -137,11 +137,15 @@ a:hover {
 /* normal links */
 #map a,
 #map a:link,
-#map a:active {
+#map a:active,
+#dealerDescription a,
+#dealerDescription a:link,
+#dealerDescription a:active {
 	color:#8DC120;
 }
 
-#map a:hover {
+#map a:hover,
+#dealerDescription a:hover {
 	color:#A4E223;
 }
 
@@ -211,7 +215,6 @@ a:hover {
 	text-align: center;
 }
 
-
 #dealerDescription .note{
 	color:#666;
 	max-width: 500px;
@@ -235,7 +238,6 @@ a:hover {
 .filter {
 	display: none;
 	position: absolute;
-	top: 57px;
 	padding: 5px 0;
 	left:0px;
 	z-index: 10000;
@@ -319,6 +321,10 @@ a:hover {
 	background: #A4E223;
 }
 
+.timestamp {
+	font-size: 0.8em;
+	color: #999;
+}
 
 /* mobile fixes */
 @media (max-width: 580px) {
@@ -327,13 +333,14 @@ a:hover {
 		font-size: 1.5em;
 	}
 
-
+	.dealers {
+		text-align: left;
+	}
 }
 
 @media (max-width: 550px) {
 	header h1 {
 		position: static;
-		afont-size: 0.8em;
 		text-align: center;
 		margin-bottom: 0;
 	}

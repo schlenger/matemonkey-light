@@ -1,7 +1,7 @@
 $( document ).ready(function() {
 	// some playing
 	$("#logo").click(function(e){
-		e.preventDefault();
+		//e.preventDefault();
 	});
 
 	// generalized filter display function
@@ -182,7 +182,7 @@ var MM = {
 	onWindowResize : function () {
 		height = window.innerHeight - $("header").height() - $("footer").height()-40;
 		$("#map").height(height);
-		$(".filter").css("top",$("header").height()+13);
+		$(".filter").css("top",$("header").height()+15);
 	},
 	// geo encodes a place string and sets view center new
 	updateMapWithGeolocation : function (geoLocation) {
@@ -240,7 +240,7 @@ var MM = {
 				var dealer = L.marker([val.address.lat, val.address.lon]).addTo(MM.markers);
 				dealer.bindPopup("<strong>"+val.name+"</strong><br>"
 					+ val.address.street+" "+val.address.number+"<br>"+val.address.postal+" "
-					+ val.address.city+"<br><a href='?id=444' onclick='event.preventDefault();"
+					+ val.address.city+"<br><a href='#' class='more' onclick='event.preventDefault();"
 					+ "MM.showDealerDescription();'>&raquo; Produkte anzeigen</a>");
 					//"<br><a href='?id=444' onclick='event.preventDefault();MM.showDealer("+val.id+
 					//	")'>Mehr anzeigen</a>");
@@ -270,6 +270,7 @@ var MM = {
 	//displays a single dealer with detailed information
 	showDealer: function (id) {
 		// direct feedback before ajax request
+		$(".more").show();
 		$("#dealerInfoWrapper").fadeIn(100);
 		//display dealerinfo
 		$("#dealerInfo h2 span").html(MM.addedDealers[id].name + " <span class='small'> | " 
@@ -281,8 +282,28 @@ var MM = {
 			type: 'GET',
 			dataType: 'json',
 			success: function(data) {
-				if(MM.addedDealers[id].note != '')
+				if(MM.addedDealers[id].note != null && MM.addedDealers[id].note != "")
 					$("#dealerDescription").append("<p class='note'>Note: "+MM.addedDealers[id].note+"</p>");
+					
+					// add contact data | is there a nicer way?
+					var contact = "<p class='contact'><strong>Contact:</strong><br>";
+					// check for both: null and ""
+					var web = MM.addedDealers[id].address.web;
+					if(web != null && web != "") {
+						// small http fix
+						if (web.indexOf("http") == -1)
+							web = "http://" + web;
+
+						contact += "<a href='"+web+"' target='_blank'>Web</a> | ";
+					}
+					
+					if(MM.addedDealers[id].address.email != null && MM.addedDealers[id].address.email != "") 
+						contact += "Mail: " + MM.addedDealers[id].address.email + " | ";
+					if(MM.addedDealers[id].address.phone != null && MM.addedDealers[id].address.phone != "") 
+						contact += "Phone: " + MM.addedDealers[id].address.phone + " | ";
+					contact = contact.substr(0, contact.length-3) + "</p>";
+					// only append, if not empty
+					if(contact.length > 53) $("#dealerDescription").append(contact);
 				//console.log("Data Fetched! - "+ JSON.stringify(data));
 				if(data.count != 0) {
 					jQuery.each(data.entries, function(i, entry) {
@@ -300,6 +321,14 @@ var MM = {
 							output += ","+p.substring(p.length-2)+" "+ MM.addedDealers[id].currency;
 							output += " per " + entry.quantity;
 						}
+
+						// add date
+						var ts = new Date(entry.created_at);
+						output += "<span class='timestamp'> (from "
+							+ ts.getUTCDate() + "."
+							+ ts.getUTCMonth() + "."
+							+ ts.getUTCFullYear()
+							+")</span>";
 
 						$("#dealerDescription").append(output + "<br>");
 					});
@@ -321,6 +350,9 @@ var MM = {
 	showDealerDescription: function () {
 		$("#dealerInfo").removeClass("clickable");
 		$("#dealerDescription").fadeIn(100);
+
+		// hide more button 
+		$(".more").fadeOut(100);
 	},
 	// helper function: updates filter criteria for products
 	updateFilterCriteria: function () {
