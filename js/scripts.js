@@ -60,7 +60,7 @@ $( document ).ready(function() {
 var MM = {
 	map: null,
 	markers : L.markerClusterGroup({ showCoverageOnHover: false, spiderfyOnMaxZoom: false }),
-	baseURL: 'http://playground.matemonkey.com/api/v1/',
+	baseURL: 'https://playground.matemonkey.com/api/v1/',
 	productFilter: '42,41,7,11,10,9,8,19,20,22,23,21,18,28,30,29,44,43,13,12,27,14,37,36,33,35,34,17,31,26,24,6,5,4,3,1,2,15,16,39,38,32,40,25',
 	dealerTypeFilter: '',
 	currentBounding: {},
@@ -298,7 +298,7 @@ var MM = {
 					}
 					
 					if(MM.addedDealers[id].address.email != null && MM.addedDealers[id].address.email != "") 
-						contact += "Mail: " + MM.addedDealers[id].address.email + " | ";
+						contact += "<a href='mailto:"+MM.addedDealers[id].address.email+"'>Mail</a> | ";
 					if(MM.addedDealers[id].address.phone != null && MM.addedDealers[id].address.phone != "") 
 						contact += "Phone: " + MM.addedDealers[id].address.phone + " | ";
 					contact = contact.substr(0, contact.length-3) + "</p>";
